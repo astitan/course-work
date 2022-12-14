@@ -1,77 +1,77 @@
 from tkinter import *
 from tkinter import messagebox
 
-gl_okno = Tk()  # создаём окно
-gl_okno.title('Так Тиль')  # заголовок окна
-doska = Canvas(gl_okno, width=400, height=400, bg='#FFFFFF')
-doska.pack()
+main_win = Tk()  # создаём окно
+main_win.title('Так Тиль')  # заголовок окна
+desk = Canvas(main_win, width=400, height=400, bg='#FFFFFF')
+desk.pack()
 
 poz1_x = -1  # клетка не задана
-f_hi = True  # определение хода игрока(да)
+f_hi = True  # право хода
 
 
-def izobrazheniya_peshek():  # загружаем изображения пешек
+def draw_fig():  # загружаем изображения пешек
     global peshki
-    i1 = PhotoImage(file="peshmod\\2b.gif")
-    i2 = PhotoImage(file="peshmod\\2h.gif")
+    i1 = PhotoImage(file="peshmod\\white.jpg")
+    i2 = PhotoImage(file="peshmod\\black.jpg")
     peshki = [0, i1, 0, i2, 0]
 
 
-def novaya_igra():  # начинаем новую игру
-    global pole
-    pole = [[1, 3, 1, 3],
+def new_game():  # новая игра
+    global field
+    field = [[1, 3, 1, 3],
             [0, 0, 0, 0],
             [0, 0, 0, 0],
             [3, 1, 3, 1]]
 
 
-def vivod(x_poz_1, y_poz_1, x_poz_2, y_poz_2):  # рисуем игровое поле
+def draw(x_poz_1, y_poz_1, x_poz_2, y_poz_2):  # рисуем игровое поле
     global peshki
-    global pole
-    global kr_ramka, zel_ramka
+    global field
+    global red_line, green_line
     k = 100
     x = 0
-    doska.delete('all')
-    kr_ramka = doska.create_rectangle(-5, -5, -5, -5, outline="red", width=5)
-    zel_ramka = doska.create_rectangle(-5, -5, -5, -5, outline="green", width=5)
+    desk.delete('all')
+    red_line = desk.create_rectangle(-5, -5, -5, -5, outline="red", width=5)
+    green_line = desk.create_rectangle(-5, -5, -5, -5, outline="green", width=5)
 
     while x < 4 * k:  # рисуем доску
         y = 1 * k
         while y < 4 * k:
-            doska.create_rectangle(x, y, x + k, y + k, fill="black")
+            desk.create_rectangle(x, y, x + k, y + k, fill="black")
             y += 2 * k
         x += 2 * k
     x = 1 * k
     while x < 4 * k:  # рисуем доску
         y = 0
         while y < 4 * k:
-            doska.create_rectangle(x, y, x + k, y + k, fill="black")
+            desk.create_rectangle(x, y, x + k, y + k, fill="black")
             y += 2 * k
         x += 2 * k
 
     for y in range(4):  # рисуем стоячие пешки
         for x in range(4):
-            z = pole[y][x]
+            z = field[y][x]
             if z:
                 if (x_poz_1, y_poz_1) != (x, y):  # стоячие пешки
-                    doska.create_image(x * k, y * k, anchor=NW, image=peshki[z])
+                    desk.create_image(x * k, y * k, anchor=NW, image=peshki[z])
     # рисуем активную пешку
-    z = pole[y_poz_1][x_poz_1]
+    z = field[y_poz_1][x_poz_1]
     if z:
-        doska.create_image(x_poz_2 * k, y_poz_2 * k, anchor=NW, image=peshki[z])
+        desk.create_image(x_poz_2 * k, y_poz_2 * k, anchor=NW, image=peshki[z])
 
 
 def pozici_1(event):  # выбор клетки для хода 1
     x, y = (event.x) // 100, (event.y) // 100  # вычисляем координаты клетки
-    doska.coords(zel_ramka, x * 100, y * 100, x * 100 + 100, y * 100 + 100)  # рамка в выбранной клетке
+    desk.coords(green_line, x * 100, y * 100, x * 100 + 100, y * 100 + 100)  # рамка в выбранной клетке
 
 
 def pozici_2(event):  # выбор клетки для хода 2
     global poz1_x, poz1_y, poz2_x, poz2_y
     global f_hi
     x, y = (event.x) // 100, (event.y) // 100  # вычисляем координаты клетки
-    if pole[y][x] == 1 or pole[y][x] == 3:  # проверяем пешку игрока в выбранной клетке
-        doska.coords(kr_ramka, x * 100, y * 100, x * 100 + 100, y * 100 + 100)  # рамка в выбранной клетке
+    if field[y][x] == 1 or field[y][x] == 3:  # проверяем пешку игрока в выбранной клетке
+        desk.coords(red_line, x * 100, y * 100, x * 100 + 100, y * 100 + 100)  # рамка в выбранной клетке
         poz1_x, poz1_y = x, y
     else:
         if poz1_x != -1:  # клетка выбрана
@@ -84,10 +84,10 @@ def pozici_2(event):  # выбор клетки для хода 2
                 check_if_win()
 
             poz1_x = -1  # клетка не выбрана
-            doska.coords(kr_ramka, -5, -5, -5, -5)  # рамка вне поля
+            desk.coords(red_line, -5, -5, -5, -5)  # рамка вне поля
 
 
-def spisok_hi():  # составляем список ходов игрока
+def spisok_hi():  # составляем список ходов игрока1
     spisok = prosmotr_hodov_i([])  # проверяем  ходы
     return spisok
 
@@ -107,7 +107,7 @@ def hod_igroka():
             hod(1, poz1_x, poz1_y, poz2_x, poz2_y)  # делаем ход
         else:
             f_hi = not f_hi  # считаем ход игрока невыполненным
-    doska.update()  # обновление
+    desk.update()  # обновление
 
 
 def hod_igroka2():
@@ -120,15 +120,15 @@ def hod_igroka2():
             hod(1, poz1_x, poz1_y, poz2_x, poz2_y)  # делаем ход
         else:
             f_hi = not f_hi  # считаем ход игрока невыполненным
-    doska.update()  # обновление
+    desk.update()  # обновление
 
 
 def hod(f, poz1_x, poz1_y, poz2_x, poz2_y):
-    global pole
+    global field
     if f:
-        vivod(poz1_x, poz1_y, poz2_x, poz2_y)  # рисуем игровое поле
-    pole[poz2_y][poz2_x] = pole[poz1_y][poz1_x]
-    pole[poz1_y][poz1_x] = 0
+        draw(poz1_x, poz1_y, poz2_x, poz2_y)  # рисуем игровое поле
+    field[poz2_y][poz2_x] = field[poz1_y][poz1_x]
+    field[poz1_y][poz1_x] = 0
 
 
 def check_if_win():
@@ -137,58 +137,58 @@ def check_if_win():
         for x in range(4):
             if (y == 0 and (x == 1 or x == 2)) or (
                     y == 3 and (x == 1 or x == 2)):  # верхние и нижние(справа и слева смотрит)
-                if pole[y][x] == 1:
-                    if pole[y][x + 1] == pole[y][x - 1] == 1:
+                if field[y][x] == 1:
+                    if field[y][x + 1] == field[y][x - 1] == 1:
                         winner = 1
-                elif pole[y][x] == 3:
-                    if pole[y][x + 1] == pole[y][x - 1] == 3:
+                elif field[y][x] == 3:
+                    if field[y][x + 1] == field[y][x - 1] == 3:
                         winner = 3
             elif ((y == 1 or y == 2) and (x == 0)) or (
                     (y == 1 or y == 2) and (x == 3)):  # правые и левые(сверху и снизу смотрит)
-                if pole[y][x] == 1:
-                    if pole[y + 1][x] == pole[y - 1][x] == 1:
+                if field[y][x] == 1:
+                    if field[y + 1][x] == field[y - 1][x] == 1:
                         winner = 1
-                elif pole[y][x] == 3:
-                    if pole[y + 1][x] == pole[y - 1][x] == 3:
+                elif field[y][x] == 3:
+                    if field[y + 1][x] == field[y - 1][x] == 3:
                         winner = 3
             elif (y == x == 1) or (y == x == 2) or (y == 1 and x == 2) or (
                     y == 2 and x == 1):  # центральные(смотрит сверху и снизу, слева и справа, по диагоналям)
-                if pole[y][x] == 1:
-                    if pole[y][x - 1] == pole[y][x + 1] == 1:
+                if field[y][x] == 1:
+                    if field[y][x - 1] == field[y][x + 1] == 1:
                         winner = 1
-                    elif pole[y - 1][x] == pole[y + 1][x] == 1:
+                    elif field[y - 1][x] == field[y + 1][x] == 1:
                         winner = 1
-                    elif pole[y - 1][x - 1] == pole[y + 1][x + 1] == 1:
+                    elif field[y - 1][x - 1] == field[y + 1][x + 1] == 1:
                         winner = 1
-                    elif pole[y - 1][x + 1] == pole[y + 1][x - 1] == 1:
+                    elif field[y - 1][x + 1] == field[y + 1][x - 1] == 1:
                         winner = 1
-                elif pole[y][x] == 3:
-                    if pole[y][x - 1] == pole[y][x + 1] == 3:
+                elif field[y][x] == 3:
+                    if field[y][x - 1] == field[y][x + 1] == 3:
                         winner = 3
-                    elif pole[y - 1][x] == pole[y + 1][x] == 3:
+                    elif field[y - 1][x] == field[y + 1][x] == 3:
                         winner = 3
-                    elif pole[y - 1][x - 1] == pole[y + 1][x + 1] == 3:
+                    elif field[y - 1][x - 1] == field[y + 1][x + 1] == 3:
                         winner = 3
-                    elif pole[y - 1][x + 1] == pole[y + 1][x - 1] == 3:
+                    elif field[y - 1][x + 1] == field[y + 1][x - 1] == 3:
                         winner = 3
     if winner == 1:
         messagebox.showinfo("Winner", "white winner!")
-        novaya_igra()
-        vivod(-1, -1, -1, -1)  # рисуем игровое поле
+        new_game()
+        draw(-1, -1, -1, -1)  # рисуем игровое поле
     elif winner == 3:
         messagebox.showinfo("Winner", "black winner!")
-        novaya_igra()
-        vivod(-1, -1, -1, -1)  # рисуем игровое поле
-        # f_hi = True  # ход игрока доступен
+        new_game()
+        draw(-1, -1, -1, -1)  # рисуем игровое поле
+
 
 
 def prosmotr_hodov_i(spisok):  # проверка наличия ходов
     for y in range(4):  # сканируем всё поле
         for x in range(4):
-            if pole[y][x] == 1:  # пешка 1
+            if field[y][x] == 1:  # пешка 1
                 for ix, iy in (0, -1), (1, 0), (0, 1), (-1, 0):
                     if 0 <= y + iy <= 3 and 0 <= x + ix <= 3:
-                        if pole[y + iy][x + ix] == 0:
+                        if field[y + iy][x + ix] == 0:
                             spisok.append(((x, y), (x + ix, y + iy)))  # запись хода в конец списка
     return spisok
 
@@ -196,19 +196,19 @@ def prosmotr_hodov_i(spisok):  # проверка наличия ходов
 def prosmotr_hodov_i2(spisok):  # проверка наличия ходов
     for y in range(4):  # сканируем всё поле
         for x in range(4):
-            if pole[y][x] == 3:  # пешка2
+            if field[y][x] == 3:  # пешка2
                 for ix, iy in (0, -1), (1, 0), (0, 1), (-1, 0):
                     if 0 <= y + iy <= 3 and 0 <= x + ix <= 3:
-                        if pole[y + iy][x + ix] == 0:
+                        if field[y + iy][x + ix] == 0:
                             spisok.append(((x, y), (x + ix, y + iy)))  # запись хода в конец списка
 
     return spisok
 
 
-izobrazheniya_peshek()  # загружаем изображения пешек
-novaya_igra()  # начинаем новую игру
-vivod(-1, -1, -1, -1)  # рисуем игровое поле
-doska.bind("<Motion>", pozici_1)  # движение мышки по полю
-doska.bind("<Button-1>", pozici_2)  # нажатие левой кнопки
+draw_fig()  # загружаем изображения пешек
+new_game()  # начинаем новую игру
+draw(-1, -1, -1, -1)  # рисуем игровое поле
+desk.bind("<Motion>", pozici_1)  # движение мышки по полю
+desk.bind("<Button-1>", pozici_2)  # нажатие левой кнопки
 
 mainloop()
